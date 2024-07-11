@@ -1,5 +1,6 @@
 using BlazorApp1.Components;
 using BlazorApp1.Data;
+using BlazorApp1.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<ExpenseTrackerContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("ExpenseTrackerDatabase")));
+
+builder.Services.AddScoped<CategoryService>();
 
 var app = builder.Build();
 
