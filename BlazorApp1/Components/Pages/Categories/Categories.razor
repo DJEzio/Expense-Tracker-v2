@@ -1,33 +1,81 @@
 ﻿@page "/categories"
 @using BlazorApp1.Services
 @using BlazorApp1.Data.Models
-@inject CategoryService Service;
+@inject CategoryService CategoryService
+@rendermode InteractiveServer
 
 <h3>Categories</h3>
 
+<button @onclick="ShowAddCategory">Add Category</button>
+
 @if (categories == null)
 {
-    <p>Loading...</p>
-}
-else if (categories.Count == 0)
-{
-    <p>No categories available.</p>
+    <p><em>Loading...</em></p>
 }
 else
 {
     <ul>
         @foreach (var category in categories)
         {
-            <li>@category.Name</li>
+            <li>
+                @category.Name
+                <button @onclick="() => DeleteCategory(category.Id)">Delete</button>
+            </li>
         }
     </ul>
 }
 
+@if (isAddCategoryVisible)
+{
+    <EditForm Model="@newCategory" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div>
+            <label>Name:</label>
+            <InputText @bind-Value="newCategory.Name" />
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" @onclick="HideAddCategory">Cancel</button>
+    </EditForm>
+}
+
 @code {
     private List<Category> categories;
+    private Category newCategory = new Category();
+    private bool isAddCategoryVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
-        categories = await Service.GetCategoriesAsync();
+        await LoadCategoriesAsync();
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    private void ShowAddCategory()
+    {
+        newCategory = new Category();
+        isAddCategoryVisible = true;
+    }
+
+    private void HideAddCategory()
+    {
+        isAddCategoryVisible = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await CategoryService.AddCategoryAsync(newCategory);
+        await LoadCategoriesAsync();
+        newCategory = new Category();
+        isAddCategoryVisible = false;
+    }
+
+    private async Task DeleteCategory(int id)
+    {
+        await CategoryService.DeleteCategoryAsync(id);
+        await LoadCategoriesAsync();
     }
 }
