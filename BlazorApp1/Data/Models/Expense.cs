@@ -19,10 +19,8 @@ namespace BlazorApp1.Data.Models
 
         public bool Planned { get; set; }
 
-        // Foreign key for Category
         public int CategoryId { get; set; }
 
-        // Navigation property for Category
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
     }

@@ -14,6 +14,8 @@ builder.Services.AddDbContext<ExpenseTrackerContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("ExpenseTrackerDatabase")));
 
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ExpenseService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

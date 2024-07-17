@@ -1,0 +1,75 @@
+﻿@page "/expenses"
+@inject NavigationManager Navigation
+@inject Services.ExpenseService ExpenseService
+@using BlazorApp1.Data.Models
+@rendermode InteractiveServer
+
+<h3>Expenses</h3>
+
+<button class="btn btn-primary" @onclick="NavigateToAddExpense">Add New Expense</button>
+
+@if (expenses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Planned</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expense in expenses)
+            {
+                <tr>
+                    <td>@expense.Title</td>
+                    <td>@expense.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@expense.Amount.ToString("C")</td>
+                    <td>@(expense.Planned ? "Yes" : "No")</td>
+                    <td>@expense.Category?.Name</td>
+                    <td>
+                        <button class="btn btn-secondary" @onclick="() => EditExpense(expense.Id)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteExpense(expense.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Expense> expenses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExpenses();
+    }
+
+    private async Task LoadExpenses()
+    {
+        expenses = await ExpenseService.GetExpensesAsync();
+    }
+
+    private void NavigateToAddExpense()
+    {
+        Navigation.NavigateTo("/expenses/new");
+    }
+
+    private void EditExpense(int expenseId)
+    {
+        Navigation.NavigateTo($"/expenses/{expenseId}");
+    }
+
+    private async Task DeleteExpense(int expenseId)
+    {
+        await ExpenseService.DeleteExpenseAsync(expenseId);
+        await LoadExpenses();
+    }
+}
