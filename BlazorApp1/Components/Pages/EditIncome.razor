@@ -1,0 +1,69 @@
+﻿@page "/incomes/{incomeId:int}/edit"
+@inject NavigationManager Navigation
+@inject Services.IncomeService IncomeService
+@using BlazorApp1.Data.Models
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+
+<h3>Edit Income</h3>
+
+@if (income == null)
+{
+    <p><em>Loading income...</em></p>
+}
+else
+{
+    <EditForm Model="@income" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Title:</label>
+            <InputText @bind-Value="income.Title" class="form-control" />
+            <ValidationMessage For="@(() => income.Title)" />
+        </div>
+
+        <div class="form-group">
+            <label>Date:</label>
+            <InputDate @bind-Value="income.Date" class="form-control" />
+            <ValidationMessage For="@(() => income.Date)" />
+        </div>
+
+        <div class="form-group">
+            <label>Amount:</label>
+            <InputNumber @bind-Value="income.Amount" class="form-control" />
+            <ValidationMessage For="@(() => income.Amount)" />
+        </div>
+
+        <div class="form-group">
+            <label>Type:</label>
+            <InputSelect @bind-Value="income.Type" class="form-control">
+                @foreach (IncomeType type in Enum.GetValues(typeof(IncomeType)))
+                {
+                    <option value="@type">@type.GetDisplayName()</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => income.Type)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int incomeId { get; set; }
+
+    private Income income;
+
+    protected override async Task OnInitializedAsync()
+    {
+        income = await IncomeService.GetIncomeByIdAsync(incomeId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await IncomeService.UpdateIncomeAsync(income);
+        Navigation.NavigateTo("/incomes");
+    }
+}

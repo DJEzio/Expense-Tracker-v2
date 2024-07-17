@@ -42,5 +42,12 @@ namespace BlazorApp1.Services
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<List<Expense>> GetExpensesByCategoryAsync(int categoryId)
+        {
+            // Assuming _context is your ExpenseTrackerContext instance
+            return await _context.Expenses
+                                 .Where(e => e.CategoryId == categoryId)
+                                 .ToListAsync();
+        }
     }
 }

@@ -1,0 +1,59 @@
+﻿@page "/categories/{categoryId:int}/expenses"
+@inject NavigationManager Navigation
+@inject Services.CategoryService CategoryService
+@inject Services.ExpenseService ExpenseService
+@using BlazorApp1.Data.Models
+@rendermode InteractiveServer
+
+
+<h3>Expenses in Category: @categoryName</h3>
+
+@if (expenses == null)
+{
+    <p><em>Loading expenses...</em></p>
+}
+else if (expenses.Count == 0)
+{
+    <p><em>No expenses found for this category.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Planned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expense in expenses)
+            {
+                <tr>
+                    <td>@expense.Title</td>
+                    <td>@expense.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@expense.Amount.ToString("C")</td>
+                    <td>@(expense.Planned ? "Yes" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int categoryId { get; set; }
+    private List<Expense> expenses;
+    private string categoryName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var category = await CategoryService.GetCategoryByIdAsync(categoryId);
+        if (category != null)
+        {
+            categoryName = category.Name;
+            expenses = await ExpenseService.GetExpensesByCategoryAsync(categoryId);
+        }
+    }
+}

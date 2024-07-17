@@ -1,0 +1,49 @@
+﻿@page "/incomes/new"
+@inject NavigationManager Navigation
+@inject Services.IncomeService IncomeService
+@using BlazorApp1.Data.Models
+@rendermode InteractiveServer
+
+<h3>Add Income</h3>
+
+<EditForm Model="@newIncome" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Title:</label>
+        <InputText @bind-Value="newIncome.Title" />
+    </div>
+
+    <div>
+        <label>Date:</label>
+        <InputDate @bind-Value="newIncome.Date" />
+    </div>
+
+    <div>
+        <label>Amount:</label>
+        <InputNumber @bind-Value="newIncome.Amount" />
+    </div>
+
+    <div>
+        <label>Type:</label>
+        <select @bind="@newIncome.Type">
+            @foreach (IncomeType type in Enum.GetValues(typeof(IncomeType)))
+            {
+                <option value="@type">@type.GetDisplayName()</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit">Save</button>
+</EditForm>
+
+@code {
+    private Income newIncome = new Income();
+
+    private async Task HandleValidSubmit()
+    {
+        await IncomeService.AddIncomeAsync(newIncome);
+        Navigation.NavigateTo("/incomes");
+    }
+}

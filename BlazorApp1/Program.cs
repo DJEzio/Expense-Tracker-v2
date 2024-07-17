@@ -15,6 +15,7 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("ExpenseTrackerDatab
 
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ExpenseService>();
+builder.Services.AddScoped<IncomeService>();
 
 var app = builder.Build();
 
